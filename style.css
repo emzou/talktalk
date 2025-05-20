@@ -1,0 +1,134 @@
+body {
+    background-color: black;
+    color: white;
+    font-family: monospace;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.title {
+    font-size: 28px;
+    color: white;
+    text-align: center;
+    margin-bottom: 10px;
+    text-transform: lowercase;
+}
+
+.chat-window {
+    max-width: 700px;
+    margin: 0 auto 1rem auto;
+    padding: 1rem 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 70vh;
+    overflow-y: auto;
+}
+
+.chat-bubble {
+    font-family: monospace;
+    transition: opacity 0.3s ease;
+    font-size: 16px;
+    padding: 10px 14px;
+    margin: 8px 0;
+    max-width: 70%;
+    border-radius: 8px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    display: inline-block;
+}
+
+.chat-bubble.left {
+    background-color: #1a1a1a;
+    color: white;
+    border-left: 3px solid white;
+    text-align: left;
+}
+
+.chat-bubble.right {
+    background-color: #1a1a1a;
+    color: violet;
+    border-right: 3px solid violet;
+    text-align: right;
+    margin-left: auto;
+    display: block;
+}
+
+.stTextInput input {
+    background-color: black !important;
+    color: limegreen !important;
+    border: none !important;
+    font-family: monospace !important;
+    padding: 10px;
+    caret-color: limegreen;
+}
+
+.cursor {
+    display: inline-block;
+    font-family: monospace;
+    color: white;
+    font-size: 20px;
+    padding-left: 5px;
+}
+
+/* Pin input form to bottom */
+.st-emotion-cache-1r6slb0 {
+    position: sticky;
+    bottom: 0;
+    background-color: black;
+    padding-bottom: 1rem;
+    z-index: 100;
+}
+
+/* Remove Streamlit's tooltip on submit */
+div[role="form"] > div::after,
+[data-testid="stFormSubmitButton"] div::after {
+    content: none !important;
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+}
+
+/* Universal button styling override (arrow, save, etc.) */
+button {
+    background-color: transparent !important;
+    color: white !important;
+    border: none !important;
+    font-family: monospace !important;
+    font-size: 20px !important;
+    box-shadow: none !important;
+    transition: color 0.2s ease !important;
+    cursor: pointer !important;
+    padding: 0.4rem 1rem !important;
+    margin-top: 4px !important;
+}
+
+button:hover {
+    color: limegreen !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+button:focus {
+    outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+
+.typing-bubble {
+    color: #c49aff !important; /* dark purple-ish */
+    font-style: italic;
+    opacity: 0.8;
+}
+
+
+
+
+
+
