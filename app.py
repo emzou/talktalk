@@ -5,6 +5,7 @@ import base64
 from datetime import datetime
 import re
 import random
+import asyncio
 
 st.set_page_config(page_title="i wish you'd talk to me", layout="centered")
 
@@ -19,7 +20,6 @@ def load_model():
     model.to(device)
     return tokenizer, model, device
 
-
 tokenizer, model, device = load_model()
 
 with open("style.css") as f:
@@ -27,7 +27,6 @@ with open("style.css") as f:
 
 st.markdown("<div class=\"title\">embot</div>", unsafe_allow_html=True)
 
-# Session state init
 if "history" not in st.session_state:
     st.session_state.history = []
 if "typing" not in st.session_state:
@@ -39,7 +38,6 @@ if "pending_chunks" not in st.session_state:
 if "current_reply" not in st.session_state:
     st.session_state.current_reply = ""
 
-# Chat display
 st.markdown("<div class='chat-window'>", unsafe_allow_html=True)
 with st.container():
     for entry in st.session_state.history:
@@ -51,7 +49,6 @@ with st.container():
         st.markdown("<div class='chat-bubble embot left typing-bubble'>embot is typing...</div>", unsafe_allow_html=True)
 st.markdown("</div>", unsafe_allow_html=True)
 
-# Chat input form
 with st.container():
     with st.form(key="chat_form", clear_on_submit=True):
         col1, col2 = st.columns([8, 1])
@@ -61,7 +58,6 @@ with st.container():
             send_clicked = st.form_submit_button("➤")
         save_clicked = st.form_submit_button("save convo")
 
-# Send logic
 if send_clicked and prompt:
     clean_prompt = re.sub(r"[^a-zA-Z0-9\s.,!?'\"]+", "", prompt)
     st.session_state.last_prompt = clean_prompt.strip().lower()
@@ -82,11 +78,10 @@ def remove_emojis(text):
         "]+", flags=re.UNICODE)
     return emoji_pattern.sub("", text)
 
-# Typing / generation logic
 if st.session_state.typing:
     if not st.session_state.pending_chunks:
         if not st.session_state.current_reply:
-            st.experimental_sleep(1.5)
+            asyncio.run(asyncio.sleep(1.5))
             prompt = st.session_state.last_prompt
             inputs = tokenizer(prompt, return_tensors="pt").to(device)
             outputs = model.generate(
@@ -104,7 +99,6 @@ if st.session_state.typing:
             result_clean = remove_emojis(result_clean)
             st.session_state.current_reply = result_clean
 
-            # Split into 8–14 token chunks
             tokens = result_clean.split()
             idx = 0
             while idx < len(tokens):
@@ -114,7 +108,6 @@ if st.session_state.typing:
                 st.session_state.pending_chunks.append(chunk)
                 idx += chunk_size
 
-            # Final ending phrase
             final_phrase = random.choice(["idk", "lol", "lmao", "haha", "wtf", "yaknow", "bruh", "omg", "fuck"])
             st.session_state.pending_chunks.append(final_phrase)
 
@@ -126,10 +119,9 @@ if st.session_state.typing:
         if not st.session_state.pending_chunks:
             st.session_state.typing = False
             st.session_state.current_reply = ""
-        st.experimental_sleep(random.uniform(0.4, 1.2))
+        asyncio.run(asyncio.sleep(random.uniform(0.4, 1.2)))
         st.rerun()
 
-# Save convo
 if save_clicked:
     now = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     filename = f"embot_{now}.txt"
