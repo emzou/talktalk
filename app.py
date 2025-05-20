@@ -13,7 +13,6 @@ st.set_page_config(page_title="i wish you'd talk to me", layout="centered")
 def load_model():
     from huggingface_hub import login
     login(st.secrets["hf_token"])
-
     tokenizer = GPT2Tokenizer.from_pretrained("wifeemailer227/gpt2-emily", use_auth_token=True)
     model = GPT2LMHeadModel.from_pretrained("wifeemailer227/gpt2-emily", use_auth_token=True)
     device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
@@ -68,15 +67,12 @@ if send_clicked and prompt:
     st.rerun()
 
 def remove_emojis(text):
-    emoji_pattern = re.compile("["
-        u"\U0001F600-\U0001F64F"
-        u"\U0001F300-\U0001F5FF"
-        u"\U0001F680-\U0001F6FF"
-        u"\U0001F1E0-\U0001F1FF"
-        u"\U00002700-\U000027BF"
-        u"\U000024C2-\U0001F251"
-        "]+", flags=re.UNICODE)
+    emoji_pattern = re.compile(r"[\U00010000-\U0010ffff]+", flags=re.UNICODE)
     return emoji_pattern.sub("", text)
+
+def filter_system_lines(text):
+    lines = text.split("\n")
+    return "\n".join(line for line in lines if "started a call that lasted" not in line.lower())
 
 if st.session_state.typing:
     if not st.session_state.pending_chunks:
@@ -97,6 +93,7 @@ if st.session_state.typing:
             result_clean = result.replace(prompt, "", 1).strip()
             result_clean = re.sub(r"http\S+|www\.\S+", "", result_clean)
             result_clean = remove_emojis(result_clean)
+            result_clean = filter_system_lines(result_clean)
             st.session_state.current_reply = result_clean
 
             tokens = result_clean.split()
@@ -133,6 +130,7 @@ if save_clicked:
         b64 = base64.b64encode(f.read()).decode()
         href = f'<a href="data:file/txt;base64,{b64}" download="{filename}">click to download</a>'
         st.markdown(href, unsafe_allow_html=True)
+
 
 
 
