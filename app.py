@@ -10,7 +10,7 @@ import asyncio
 st.set_page_config(page_title="i wish you'd talk to me", layout="centered")
 with st.expander("more info"):
     st.markdown("<div style='color: white; font-size: 14px;'>17,374 lines</div>", unsafe_allow_html=True)
-    st.image("emzou_origins.png", use_column_width=True)
+    st.image("emzou_origins.png", use_container_width=True)
 
 
 @st.cache_resource
@@ -65,11 +65,7 @@ if send_clicked and prompt:
     st.rerun()
 
 def remove_emojis(text):
-    emoji_pattern = re.compile("["
-        "\U00010000-\U0010ffff"  # includes extended emoji and symbols
-        "]+", flags=re.UNICODE)
-    return emoji_pattern.sub("", text)
-
+    return re.sub(r"[^\w\s.,!?'\"]+", "", text)
 
 if st.session_state.typing:
     if not st.session_state.pending_chunks:
@@ -94,12 +90,13 @@ if st.session_state.typing:
             lines = [line.strip() for line in result_clean.split("\n") if line.strip()][:3]
             st.session_state.current_reply = "\n".join(lines)
             for line in lines:
-                st.session_state.pending_chunks.append(line)
+                st.session_state.pending_chunks.append({"sender": "embot", "text": line})
+
         st.rerun()
 
     else:
-        chunk = st.session_state.pending_chunks.pop(0)
-        st.session_state.history.append({"sender": "embot", "text": chunk})
+        entry = st.session_state.pending_chunks.pop(0)
+        st.session_state.history.append(entry)
         if not st.session_state.pending_chunks:
             st.session_state.typing = False
             st.session_state.current_reply = ""
