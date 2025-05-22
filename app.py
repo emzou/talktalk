@@ -67,6 +67,19 @@ if send_clicked and prompt:
 def remove_emojis(text):
     return re.sub(r"[^\w\s.,!?'\"]+", "", text)
 
+def remove_junk_words(text):
+    words = text.split()
+    clean_words = []
+    for word in words:
+        # remove if it's >5 chars and all digits
+        if re.fullmatch(r"\d{6,}", word):
+            continue
+        # remove if it's long and has no vowels (e.g., hex or junk)
+        if len(word) >= 6 and not re.search(r"[aeiouAEIOU]", word):
+            continue
+        clean_words.append(word)
+    return " ".join(clean_words)
+
 if st.session_state.typing:
     if not st.session_state.pending_chunks:
         if not st.session_state.current_reply:
@@ -86,6 +99,7 @@ if st.session_state.typing:
             result_clean = result.replace(prompt, "", 1).strip()
             result_clean = re.sub(r"http\S+|www\.\S+", "", result_clean)
             result_clean = remove_emojis(result_clean)
+            result_clean = remove_junk_words(result_clean)
             # split into lines and take first 3
             lines = [line.strip() for line in result_clean.split("\n") if line.strip()][:3]
             st.session_state.current_reply = "\n".join(lines)
